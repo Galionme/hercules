@@ -1,6 +1,6 @@
 module github.com/Galionme/hercules
 
-go 1.18
+go 1.21
 
 require (
 	github.com/golang/protobuf v1.5.4
