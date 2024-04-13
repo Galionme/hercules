@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/Galionme/hercules/grpcapi"
+	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -17,8 +18,14 @@ func main() {
 		err    error
 		client grpcapi.AdminClient
 	)
+
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	opts = append(opts, grpc.WithInsecure())
-	if conn, err = grpc.Dial(fmt.Sprintf("localhost:%d", 9090), opts...); err != nil {
+	if conn, err = grpc.Dial(fmt.Sprintf("%s:%s", os.Getenv("ADMIN_HOST"), os.Getenv("ADMIN_PORT")), opts...); err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()

